@@ -20,7 +20,7 @@ func checkRole(next echo.HandlerFunc) echo.HandlerFunc {
 		role := claims["role"].(string)
 		userId := claims["userId"].(float64)
 		var permission []entities.Permission
-		database.Instance.Raw("SELECT * FROM permissions WHERE user_id = ?", userId).Scan(&permission)
+		database.Instance.Where("user_id = ?", userId).Find(&permission)
 		if role == "admin" {
 			return next(c)
 		}

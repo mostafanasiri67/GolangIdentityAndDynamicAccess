@@ -22,8 +22,7 @@ func Register(c echo.Context) error {
 		return err
 	}
 	var result int
-	database.Instance.Raw("SELECT id FROM users WHERE username = ?", user.Username).Scan(&result)
-
+	database.Instance.Select("id").Where("username = ?").Find(&result)
 	if result != 0 {
 		resp := c.JSON(http.StatusInternalServerError, helper.ErrorLog(http.StatusInternalServerError, "Username existed", "EXT_REF"))
 		return resp
@@ -48,7 +47,7 @@ func Login(c echo.Context) error {
 	var result models.User
 	var user entities.User
 	var permission []entities.Permission
-	database.Instance.Raw("SELECT * FROM users WHERE username = ?", loginUser.Username).Scan(&user)
+	database.Instance.Where("username = ?", loginUser.Username).Find(&user)
 	if user.ID == 0 {
 		resp := c.JSON(http.StatusInternalServerError, helper.ErrorLog(http.StatusInternalServerError, "username not found", "EXT_REF"))
 		return resp
@@ -61,7 +60,7 @@ func Login(c echo.Context) error {
 		return resp
 	}
 	//permission list
-	database.Instance.Raw("SELECT * FROM permissions WHERE user_id = ?", user.ID).Scan(&permission)
+	database.Instance.Where("user_id = ?", user.ID).Find(&permission)
 
 	//addUserToken
 	AccessToken, RefreshToken, permissionToken := AddUserToken(user, permission)
@@ -96,7 +95,7 @@ func GetDynamicPermission(c echo.Context) error {
 func GetUserDynamicPermission(c echo.Context) error {
 	userId := c.Param("id")
 	var permission []entities.Permission
-	database.Instance.Raw("SELECT * FROM permissions WHERE user_id = ?", userId).Scan(&permission)
+	database.Instance.Where("user_id = ?", userId).Find(&permission)
 	data, err := json.MarshalIndent(c.Echo().Routes(), "", "  ")
 	if err != nil {
 		return err
@@ -138,7 +137,9 @@ func RemoveDynamicPermission(c echo.Context) error {
 func Logout(c echo.Context) error {
 	refreshToken := c.QueryParam("refreshToken")
 	fmt.Println(refreshToken)
-	database.Instance.Exec("Delete FROM user_tokens WHERE refresh_token = ?", refreshToken)
+	var userTokens []entities.UserToken
+	database.Instance.Where("refresh_token = ?", refreshToken).Find(&userTokens)
+	database.Instance.Delete(userTokens)
 	return c.JSON(http.StatusOK, "true")
 }
 func Users(c echo.Context) error {
@@ -155,7 +156,7 @@ func ChangePassword(c echo.Context) error {
 	token := c.Get("user").(*jwt.Token)
 	claims := token.Claims.(jwt.MapClaims)
 	username := claims["name"].(string)
-	database.Instance.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user)
+	database.Instance.Where("username = ?", username).Find(&user)
 	if user.ID == 0 {
 		resp := c.JSON(http.StatusInternalServerError, helper.ErrorLog(http.StatusInternalServerError, "username not found", "EXT_REF"))
 		return resp
@@ -184,15 +185,15 @@ func RefreshToken(c echo.Context) error {
 	var user entities.User
 	var result models.User
 	userToken := new(entities.UserToken)
-	database.Instance.Raw("SELECT * FROM user_tokens WHERE refresh_token = ?", model.RefreshToken).Scan(&userToken)
+	database.Instance.Where("refresh_token = ?", model.RefreshToken).Find(&userToken)
 	if userToken.ID == 0 {
 		resp := c.JSON(http.StatusInternalServerError, helper.ErrorLog(http.StatusInternalServerError, "not found", "EXT_REF"))
 		return resp
 	}
 	database.Instance.First(&user, userToken.UserId)
-	database.Instance.Exec("Delete FROM user_tokens WHERE refresh_token = ?", model.RefreshToken)
+	database.Instance.Delete(&userToken)
 	var permission []entities.Permission
-	database.Instance.Raw("SELECT * FROM permissions WHERE user_id = ?", user.ID).Scan(&permission)
+	database.Instance.Where("user_id = ?", user.ID).Find(&permission)
 	AccessToken, RefreshToken, PermissionToken := AddUserToken(user, permission)
 	result.AccessToken = AccessToken
 	result.RefreshToken = RefreshToken
