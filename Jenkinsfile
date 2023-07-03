@@ -16,12 +16,13 @@ pipeline {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'go build -o build/app.exe'
+                sh 'go build -o myapp'
             }
         }
 		stage('Copy build directory') {
             steps {
-			    sh 'cp -r build /destination-folder'
+			    sh './myapp'
+			    sh 'cp -r build /'
 
             }
         }
