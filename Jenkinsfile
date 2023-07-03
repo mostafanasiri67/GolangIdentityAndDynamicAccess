@@ -21,7 +21,7 @@ pipeline {
         }
 		stage('Copy build directory') {
             steps {
-			    sh './myapp'
+			    //sh './myapp'
 			    sh 'cp -r build /'
 
             }
