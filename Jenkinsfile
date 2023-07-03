@@ -15,7 +15,7 @@ pipeline {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'docker build . -t shadowshotx/product-go-micro'
+                sh 'go build'
             }
         }
     }
