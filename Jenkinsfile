@@ -9,14 +9,21 @@ pipeline {
         CGO_ENABLED = 0 
         GOPATH = "${JENKINS_HOME}/jobs/${JOB_NAME}/builds/${BUILD_ID}"
     }
+	 
     stages {
         stage("build") {
             steps {
                 echo 'BUILD EXECUTION STARTED'
                 sh 'go version'
                 sh 'go get ./...'
-                sh 'go build'
+                sh 'go build -o build/app.exe'
+            }
+        }
+		stage('Copy build directory') {
+            steps {
+                bat 'xcopy /E /I build C:\\build'
             }
         }
     }
 }
+
