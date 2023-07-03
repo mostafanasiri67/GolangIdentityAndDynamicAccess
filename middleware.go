@@ -34,7 +34,7 @@ func checkRole(next echo.HandlerFunc) echo.HandlerFunc {
 		if hasPermission {
 			return next(c)
 		} else {
-			return echo.ErrUnauthorized
+			return echo.ErrForbidden
 		}
 
 	}

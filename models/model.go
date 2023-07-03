@@ -9,6 +9,7 @@ type Error struct {
 
 type ApiConfig struct {
 	LoginPath             string `json:"loginPath"`
+	RegisterPath          string `json:"registerPath"`
 	LogoutPath            string `json:"logoutPath"`
 	RefreshTokenPath      string `json:"refreshTokenPath"`
 	AccessTokenObjectKey  string `json:"accessTokenObjectKey"`

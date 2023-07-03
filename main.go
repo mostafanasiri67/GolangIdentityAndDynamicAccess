@@ -65,6 +65,6 @@ func RegisterProductRoutes(e *echo.Echo) {
 	fmt.Println(string(data))
 }
 func getConfig(c echo.Context) error {
-	apiConfig := &models.ApiConfig{AdminRoleName: "admin", LoginPath: "auth/signin", LogoutPath: "auth/logout", AccessTokenObjectKey: "AccessToken", RefreshTokenObjectKey: "RefreshToken", RefreshTokenPath: "auth/refreshToken"}
+	apiConfig := &models.ApiConfig{AdminRoleName: "admin", LoginPath: "auth/signin", RegisterPath: "auth/signup", LogoutPath: "auth/logout", AccessTokenObjectKey: "AccessToken", RefreshTokenObjectKey: "RefreshToken", RefreshTokenPath: "auth/refreshToken"}
 	return c.JSON(http.StatusOK, apiConfig)
 }
