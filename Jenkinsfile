@@ -21,7 +21,8 @@ pipeline {
         }
 		stage('Copy build directory') {
             steps {
-                bat 'xcopy /E /I build C:\\build'
+			    sh 'cp -r build /destination-folder'
+
             }
         }
     }
