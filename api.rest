@@ -1,0 +1,77 @@
+@host = localhost:10000
+
+
+
+// Create register
+POST http://{{host}}/api/auth/signup HTTP/1.1
+content-type: application/json
+    
+{
+    "username": "admin",
+    "firstname": "mostafa",
+    "Lastname": "nasiri",
+    "Password": "1234"
+}
+###
+# @name login
+// Create login
+POST http://{{host}}/api/auth/signin HTTP/1.1
+content-type: application/json
+    
+{
+    "username": "admin",
+    "Password": "1234"
+}
+### VARIABLE RESPONSE TO FILL TOKEN
+@authtoken= {{login.response.body.$.AccessToken}}
+
+###
+
+// Get Product By ID
+GET http://{{host}}/api/DynamicPermission HTTP/1.1
+content-type: application/json
+###
+// Create Product
+POST http://{{host}}/api/products HTTP/1.1
+content-type: application/json
+Authorization:Bearer {{authtoken}}
+
+{
+    "name": "test-product",
+    "description": "random-description",
+    "price": 100.00
+}
+
+###
+
+// Get Product By ID
+GET http://{{host}}/api/products/2 HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{authtoken}}
+###
+
+// Get All Products
+GET http://{{host}}/api/products HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{authtoken}}
+
+###
+
+// Update Product
+PUT http://{{host}}/api/products/2 HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{authtoken}}
+
+{
+    "id":2,
+    "name": "updated-product2",
+    "description": "random-description-updated",
+    "price": 100.00
+}
+
+###
+
+// Delete Product
+DELETE http://{{host}}/api/products/3 HTTP/1.1
+content-type: application/json
+Authorization: Bearer {{authtoken}}    
